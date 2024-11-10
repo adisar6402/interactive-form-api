@@ -8,8 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
+      "src": "/send-email",
+      "dest": "api/index.js"
     }
   ]
 }
