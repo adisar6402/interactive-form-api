@@ -15,6 +15,7 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
+// CORS configuration
 app.use(cors({
   origin: 'https://js-form-data-capture.vercel.app', // Replace with your actual frontend URL
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -23,6 +24,11 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Route to test endpoint reachability
+app.get('/test', (req, res) => {
+  res.status(200).send("Email endpoint is reachable!");
+});
 
 let db;
 async function connectToDatabase() {
@@ -83,5 +89,5 @@ connectToDatabase().then(() => {
   console.log(`Serverless function triggered for POST requests`);
 });
 
+// Module export
 module.exports = app;
-
