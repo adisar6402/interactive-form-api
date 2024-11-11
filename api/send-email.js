@@ -49,6 +49,8 @@ app.get('/api/test', (req, res) => {
 app.post('/api/send-email', async (req, res) => {
   const { name, email, contact, phone } = req.body;
 
+  console.log('Received form data:', req.body);
+
   if (!db) {
     console.error("Database not connected");
     return res.status(500).send("Database connection failed");
