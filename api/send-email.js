@@ -16,12 +16,14 @@ const client = new MongoClient(uri, {
 const app = express();
 
 // CORS configuration
-app.use(cors());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://js-form-data-capture.vercel.app");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+const corsOptions = {
+  origin: 'https://js-form-data-capture.vercel.app', // Your frontend URL
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
@@ -46,9 +48,9 @@ app.get('/api/test', (req, res) => {
 });
 
 // Define the /send-email endpoint
-app.options('/api/send-email', cors()); // Enable pre-flight requests
+app.options('/api/send-email', cors(corsOptions)); // Enable pre-flight requests
 
-app.post('/api/send-email', async (req, res) => {
+app.post('/api/send-email', cors(corsOptions), async (req, res) => {
   const { name, email, contact, phone } = req.body;
 
   console.log('Received form data:', req.body);
