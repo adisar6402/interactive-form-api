@@ -48,7 +48,7 @@ app.get('/api/test', (req, res) => {
 });
 
 // Define the /send-email endpoint
-app.options('/api/send-email', cors(corsOptions)); // Enable preflight response
+app.options('/api/send-email', cors(corsOptions)); // Enable pre-flight requests
 
 app.post('/api/send-email', cors(corsOptions), async (req, res) => {
   const { name, email, contact, phone } = req.body;
