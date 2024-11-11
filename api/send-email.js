@@ -61,7 +61,7 @@ app.post('/api/send-email', async (req, res) => {
     console.log('Form submission saved to MongoDB:', submission);
   } catch (error) {
     console.error('Error saving to MongoDB:', error);
-    return res.status(500).send('Error saving form submission');
+    return res.status(500).send(`Error saving form submission: ${error.message}`);
   }
 
   const transporter = nodemailer.createTransport({
