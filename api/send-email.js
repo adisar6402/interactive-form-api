@@ -47,8 +47,11 @@ app.get('/api/test', (req, res) => {
 
 // Define the /send-email endpoint
 app.post('/api/send-email', async (req, res) => {
-  const { name, email, contact, phone } = req.body;
+  res.header("Access-Control-Allow-Origin", "https://js-form-data-capture.vercel.app");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
+  const { name, email, contact, phone } = req.body;
+  
   console.log('Received form data:', req.body);
 
   if (!db) {
