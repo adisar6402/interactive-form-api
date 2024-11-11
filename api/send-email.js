@@ -4,7 +4,6 @@ const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-// MongoDB connection URI from environment variables
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
   serverApi: {
@@ -18,19 +17,17 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://js-form-data-capture.vercel.app',
+  origin: 'https://js-form-data-capture.vercel.app', // Your frontend URL
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 
+// Middleware
 app.use(express.json());
+app.use(express.static('public'));
 
-// Test endpoint to confirm server functionality
-app.get('/test', (req, res) => {
-  res.status(200).send("Test endpoint is working!");
-});
-
+// Connect to MongoDB
 let db;
 async function connectToDatabase() {
   try {
@@ -39,11 +36,17 @@ async function connectToDatabase() {
     console.log("Connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
-    process.exit(1); // Stop the process if unable to connect
+    process.exit(1);
   }
 }
 
-app.post('/send-email', async (req, res) => {
+// Define the /test endpoint
+app.get('/api/test', (req, res) => {
+  res.send('API is working!');
+});
+
+// Define the /send-email endpoint
+app.post('/api/send-email', async (req, res) => {
   const { name, email, contact, phone } = req.body;
 
   if (!db) {
@@ -51,7 +54,6 @@ app.post('/send-email', async (req, res) => {
     return res.status(500).send("Database connection failed");
   }
 
-  // Save form submission to MongoDB
   const submission = { name, email, contact, phone, date: new Date() };
   try {
     const collection = db.collection('submissions');
@@ -62,7 +64,6 @@ app.post('/send-email', async (req, res) => {
     return res.status(500).send('Error saving form submission');
   }
 
-  // Nodemailer transport setup
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -71,15 +72,13 @@ app.post('/send-email', async (req, res) => {
     },
   });
 
-  // Email details
   const mailOptions = {
-    from: process.env.EMAIL_USER, // Ensure EMAIL_USER is set up correctly
+    from: email,
     to: process.env.EMAIL_USER,
     subject: 'New Form Submission',
     text: `Name: ${name}\nEmail: ${email}\nContact Method: ${contact}${contact === 'phone' ? `\nPhone: ${phone}` : ''}`,
   };
 
-  // Send email
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error occurred while sending email:', error);
@@ -90,9 +89,12 @@ app.post('/send-email', async (req, res) => {
   });
 });
 
-// Connect to the database on startup
+// Connect to the database and start the server
 connectToDatabase().then(() => {
-  console.log(`Serverless function triggered for POST requests`);
+  const PORT = process.env.PORT || 9000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });
 
 module.exports = app;
